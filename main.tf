@@ -1,7 +1,7 @@
 data "aws_subnets" "available-subnets"{
     filter {
         name = "availability-zone"
-        values = ["us-east-1a", "us-east-1b"]  # Adjust region/AZs as needed
+        values = ["ap-south-1a", "ap-south-1b"]  # Adjust region/AZs as needed
     }
 }
 
