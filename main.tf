@@ -1,8 +1,12 @@
-data "aws_subnets" "available-subnets"{
-    filter {
-        name = "availability-zone"
-        values = ["ap-south-1a", "ap-south-1b"]  # Adjust region/AZs as needed
-    }
+data "aws_vpc" "selected" {
+  default = true
+}
+
+data "aws_subnets" "available-subnets" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.selected.id]
+  }
 }
 
 resource "aws_eks_cluster" "project-cluster" {
