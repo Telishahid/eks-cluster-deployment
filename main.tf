@@ -7,10 +7,15 @@ data "aws_subnets" "available-subnets" {
     name   = "vpc-id"
     values = [data.aws_vpc.selected.id]
   }
+
+  filter {
+    name   = "default-for-az"
+    values = ["true"]
+  }
 }
 
 resource "aws_eks_cluster" "shahid-cluster" {
-  name     = "project-cluster"
+  name     = "shahid-cluster"
   role_arn = aws_iam_role.example.arn
 
   access_config {
@@ -61,4 +66,20 @@ resource "aws_eks_node_group" "node-grp" {
     aws_iam_role_policy_attachment.AmazonEKS_CNI_Policy,
     aws_iam_role_policy_attachment.AmazonEC2ContainerRegistryReadOnly
     ]  
+}
+
+resource "aws_eks_access_entry" "terraform-admin" {
+  cluster_name  = aws_eks_cluster.shahid-cluster.name
+  principal_arn = "arn:aws:iam::861276093737:role/Terraform-Admin"
+  type          = "STANDARD"
+}
+
+resource "aws_eks_access_policy_association" "terraform-admin-policy" {
+  cluster_name  = aws_eks_cluster.shahid-cluster.name
+  principal_arn = aws_eks_access_entry.terraform-admin.principal_arn
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+  access_scope {
+    type = "cluster"
+  }
 }
