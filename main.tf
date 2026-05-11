@@ -9,9 +9,13 @@ data "aws_subnets" "available-subnets" {
   }
 }
 
-resource "aws_eks_cluster" "project-cluster" {
+resource "aws_eks_cluster" "shahid-cluster" {
   name     = "project-cluster"
   role_arn = aws_iam_role.example.arn
+
+  access_config {
+  authentication_mode = "API_AND_CONFIG_MAP"
+}
 
   vpc_config {
     subnet_ids = data.aws_subnets.available-subnets.ids
@@ -26,21 +30,21 @@ resource "aws_eks_cluster" "project-cluster" {
 }
 
 output "endpoint" {
-  value = aws_eks_cluster.project-cluster.endpoint
+  value = aws_eks_cluster.shahid-cluster.endpoint
 }
 
 output "kubeconfig-certificate-authority-data" {
-  value = aws_eks_cluster.project-cluster.certificate_authority[0].data
+  value = aws_eks_cluster.shahid-cluster.certificate_authority[0].data
 }
 
 resource "aws_eks_node_group" "node-grp" {
-  cluster_name    = aws_eks_cluster.project-cluster.name
+  cluster_name    = aws_eks_cluster.shahid-cluster.name
   node_group_name = "pc-node-group"
   node_role_arn   = aws_iam_role.worker.arn
   subnet_ids      = data.aws_subnets.available-subnets.ids
   capacity_type   = "ON_DEMAND"
   disk_size       = "20"
-  instance_types  = ["t3.micro"]
+  instance_types  = ["c7i-flex.large"]
   labels = tomap({ env = "dev" })
 
   scaling_config {
